@@ -10,7 +10,7 @@ const ngServe = spawn("ng", ["serve"], {
 // Aguarda o servidor Angular iniciar
 setTimeout(() => {
   // Inicia o Electron
-  const electron = spawn("electron", ["."], {
+  const electron = spawn("npx", ["electron", "."], {
     stdio: "inherit",
     shell: true,
     env: {
