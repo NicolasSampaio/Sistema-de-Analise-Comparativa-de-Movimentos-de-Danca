@@ -7,46 +7,46 @@
 
 ## Table of Contents
 
-- [Introduction](https://www.google.com/search?q=%23introduction)
-- [Overall Frontend Philosophy & Patterns](https://www.google.com/search?q=%23overall-frontend-philosophy--patterns)
-- [Detailed Frontend Directory Structure](https://www.google.com/search?q=%23detailed-frontend-directory-structure)
-- [Component Breakdown & Implementation Details](https://www.google.com/search?q=%23component-breakdown--implementation-details)
-  - [Component Naming & Organization](https://www.google.com/search?q=%23component-naming--organization)
-  - [Template for Component Specification](https://www.google.com/search?q=%23template-for-component-specification)
-  - [Foundational/Shared Components](https://www.google.com/search?q=%23foundationalshared-components)
-- [State Management In-Depth](https://www.google.com/search?q=%23state-management-in-depth)
-  - [Store Structure / Slices](https://www.google.com/search?q=%23store-structure--slices)
-  - [Key Selectors](https://www.google.com/search?q=%23key-selectors)
-  - [Key Actions / Reducers / Thunks](https://www.google.com/search?q=%23key-actions--reducers--thunks)
-- [API Interaction Layer](https://www.google.com/search?q=%23api-interaction-layer)
-  - [Client/Service Structure](https://www.google.com/search?q=%23clientservice-structure)
-  - [Error Handling & Retries (Frontend)](https://www.google.com/search?q=%23error-handling--retries-frontend)
-- [Routing Strategy](https://www.google.com/search?q=%23routing-strategy)
-  - [Route Definitions](https://www.google.com/search?q=%23route-definitions)
-  - [Route Guards / Protection](https://www.google.com/search?q=%23route-guards--protection)
-- [Electron Integration](https://www.google.com/search?q=%23electron-integration)
-  - [IPC Communication (`preload.js`)](https://www.google.com/search?q=%23ipc-communication-preloadjs)
-  - [Electron-Specific Services](https://www.google.com/search?q=%23electron-specific-services)
-- [Styling and Theming](https://www.google.com/search?q=%23styling-and-theming)
-  - [Approach](https://www.google.com/search?q=%23approach)
-  - [UI Component Library](https://www.google.com/search?q=%23ui-component-library)
-  - [Theming (Light/Dark)](https://www.google.com/search?q=%23theming-lightdark)
-- [Forms and Validation](https://www.google.com/search?q=%23forms-and-validation)
-- [Build, Bundling, and Deployment](https://www.google.com/search?q=%23build-bundling-and-deployment)
-  - [Build Process & Scripts](https://www.google.com/search?q=%23build-process--scripts)
-  - [Key Bundling Optimizations](https://www.google.com/search?q=%23key-bundling-optimizations)
-  - [Deployment to CDN/Hosting](https://www.google.com/search?q=%23deployment-to-cdnhosting)
-- [Frontend Testing Strategy](https://www.google.com/search?q=%23frontend-testing-strategy)
-  - [Component Testing](https://www.google.com/search?q=%23component-testing)
-  - [UI Integration/Flow Testing](https://www.google.com/search?q=%23ui-integrationflow-testing)
-  - [End-to-End UI Testing Tools & Scope](https://www.google.com/search?q=%23end-to-end-ui-testing-tools--scope)
-- [Accessibility (AX) Implementation Details](https://www.google.com/search?q=%23accessibility-ax-implementation-details)
-- [Performance Considerations](https://www.google.com/search?q=%23performance-considerations)
-- [Internationalization (i18n) and Localization (l10n) Strategy](https://www.google.com/search?q=%23internationalization-i18n-and-localization-l10n-strategy)
-- [Feature Flag Management](https://www.google.com/search?q=%23feature-flag-management)
-- [Frontend Security Considerations](https://www.google.com/search?q=%23frontend-security-considerations)
-- [Browser Support and Progressive Enhancement](https://www.google.com/search?q=%23browser-support-and-progressive-enhancement)
-- [Change Log](https://www.google.com/search?q=%23change-log)
+- [Introduction](#introduction)
+- [Overall Frontend Philosophy & Patterns](#overall-frontend-philosophy--patterns)
+- [Detailed Frontend Directory Structure](#detailed-frontend-directory-structure)
+- [Component Breakdown & Implementation Details](#component-breakdown--implementation-details)
+  - [Component Naming & Organization](#component-naming--organization)
+  - [Template for Component Specification](#template-for-component-specification)
+  - [Foundational/Shared Components](#foundationalshared-components)
+- [State Management In-Depth](#state-management-in-depth)
+  - [Store Structure / Slices](#store-structure--slices)
+  - [Key Selectors](#key-selectors)
+  - [Key Actions / Reducers / Thunks](#key-actions--reducers--thunks)
+- [API Interaction Layer](#api-interaction-layer)
+  - [Client/Service Structure](#clientservice-structure)
+  - [Error Handling & Retries (Frontend)](#error-handling--retries-frontend)
+- [Routing Strategy](#routing-strategy)
+  - [Route Definitions](#route-definitions)
+  - [Route Guards / Protection](#route-guards--protection)
+- [Electron Integration](#electron-integration)
+  - [IPC Communication (`preload.js`)](#ipc-communication-preloadjs)
+  - [Electron-Specific Services](#electron-specific-services)
+- [Styling and Theming](#styling-and-theming)
+  - [Approach](#approach)
+  - [UI Component Library](#ui-component-library)
+  - [Theming (Light/Dark)](#theming-lightdark)
+- [Forms and Validation](#forms-and-validation)
+- [Build, Bundling, and Deployment](#build-bundling-and-deployment)
+  - [Build Process & Scripts](#build-process--scripts)
+  - [Key Bundling Optimizations](#key-bundling-optimizations)
+  - [Deployment to CDN/Hosting](#deployment-to-cdnhosting)
+- [Frontend Testing Strategy](#frontend-testing-strategy)
+  - [Component Testing](#component-testing)
+  - [UI Integration/Flow Testing](#ui-integrationflow-testing)
+  - [End-to-End UI Testing Tools & Scope](#end-to-end-ui-testing-tools--scope)
+- [Accessibility (AX) Implementation Details](#accessibility-ax-implementation-details)
+- [Performance Considerations](#performance-considerations)
+- [Internationalization (i18n) and Localization (l10n) Strategy](#internationalization-i18n-and-localization-l10n-strategy)
+- [Feature Flag Management](#feature-flag-management)
+- [Frontend Security Considerations](#frontend-security-considerations)
+- [Browser Support and Progressive Enhancement](#browser-support-and-progressive-enhancement)
+- [Change Log](#change-log)
 
 ## Introduction
 
@@ -385,13 +385,37 @@ Conforme definido no `Architecture.md`, um script `preload.js` será usado para 
   ```javascript
   const { contextBridge, ipcRenderer } = require("electron");
 
+  // Schemas de payload para comunicação IPC
+  /**
+   * @typedef {Object} OpenDialogOptions
+   * @property {string[]} [filters] - Filtros de arquivo (ex: [{ name: 'Videos', extensions: ['mp4', 'mov'] }])
+   * @property {string} [title] - Título da janela de diálogo
+   * @property {string} [defaultPath] - Caminho inicial do diálogo
+   * @property {boolean} [properties] - Propriedades do diálogo (ex: ['openFile', 'multiSelections'])
+   */
+
+  /**
+   * @typedef {Object} OpenDialogReturnValue
+   * @property {boolean} canceled - Se o usuário cancelou a seleção
+   * @property {string[]} filePaths - Array de caminhos de arquivo selecionados
+   */
+
+  /**
+   * @typedef {Object} PythonServerResponse
+   * @property {boolean} success - Se a operação foi bem sucedida
+   * @property {string} [message] - Mensagem de erro ou sucesso
+   */
+
   contextBridge.exposeInMainWorld("electronAPI", {
+    // Diálogo de seleção de arquivo
     showOpenDialog: (options) => ipcRenderer.invoke("dialog:openFile", options),
-    // Exemplo de como o Electron pode gerenciar o servidor Python:
+
+    // Gerenciamento do servidor Python
     startPythonServer: () => ipcRenderer.invoke("python:start-server"),
     stopPythonServer: () => ipcRenderer.send("python:stop-server"),
     getPythonServerStatus: () => ipcRenderer.invoke("python:get-status"),
-    // Listener para status do servidor Python (opcional, se o main envia proativamente)
+
+    // Listener para status do servidor Python
     onPythonServerStatusUpdate: (callback) =>
       ipcRenderer.on("python-status-update", (_event, value) =>
         callback(value)
@@ -400,12 +424,77 @@ Conforme definido no `Architecture.md`, um script `preload.js` será usado para 
   ```
 
 - **`main.js` (em `app-ui/main.js`):**
-  - DEVE implementar os handlers para os canais IPC invocados/enviados pelo `preload.js`.
-    - `ipcMain.handle('dialog:openFile', async (event, options) => { ... dialog.showOpenDialog(mainWindow, options) ... });`
-    - `ipcMain.handle('python:start-server', async () => { /* Lógica para iniciar servidor Python */ });`
-    - `ipcMain.send('python:stop-server', () => { /* Lógica para parar servidor Python */ });`
-    - `ipcMain.handle('python:get-status', async () => { /* Lógica para verificar status do servidor Python */ });`
-  - A lógica para iniciar e parar o servidor Python (`core-logic/main_core_entry.py`) será gerenciada aqui, usando `child_process` do Node.js.
+
+  - DEVE implementar os handlers para os canais IPC invocados/enviados pelo `preload.js`:
+
+  ```javascript
+  const { ipcMain, dialog } = require("electron");
+  const { spawn } = require("child_process");
+  const path = require("path");
+
+  // Handler para diálogo de seleção de arquivo
+  ipcMain.handle("dialog:openFile", async (event, options) => {
+    try {
+      const result = await dialog.showOpenDialog(mainWindow, {
+        ...options,
+        properties: ["openFile", ...(options.properties || [])],
+      });
+
+      // Validação de segurança para caminhos de arquivo
+      if (!result.canceled && result.filePaths.length > 0) {
+        const validatedPaths = result.filePaths.map((filePath) => {
+          // Normaliza o caminho e verifica se está dentro de diretórios permitidos
+          const normalizedPath = path.normalize(filePath);
+          // TODO: Implementar lógica de validação de diretório permitido
+          return normalizedPath;
+        });
+        return { canceled: false, filePaths: validatedPaths };
+      }
+      return result;
+    } catch (error) {
+      console.error("Erro no diálogo de arquivo:", error);
+      return { canceled: true, filePaths: [] };
+    }
+  });
+
+  // Handler para iniciar servidor Python
+  ipcMain.handle("python:start-server", async () => {
+    try {
+      const pythonPath = path.join(
+        __dirname,
+        "../core-logic/main_core_entry.py"
+      );
+      const pythonProcess = spawn("python", [pythonPath]);
+
+      pythonProcess.on("error", (error) => {
+        console.error("Erro ao iniciar servidor Python:", error);
+        mainWindow.webContents.send("python-status-update", {
+          status: "error",
+          message: error.message,
+        });
+      });
+
+      return { success: true, message: "Servidor Python iniciado" };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  });
+
+  // Handler para parar servidor Python
+  ipcMain.handle("python:stop-server", () => {
+    // TODO: Implementar lógica para parar o servidor Python
+    mainWindow.webContents.send("python-status-update", {
+      status: "stopped",
+      message: "Servidor Python parado",
+    });
+  });
+
+  // Handler para verificar status do servidor Python
+  ipcMain.handle("python:get-status", async () => {
+    // TODO: Implementar lógica para verificar status do servidor
+    return { status: "running", message: "Servidor Python em execução" };
+  });
+  ```
 
 ### Electron-Specific Services
 
@@ -598,6 +687,83 @@ Conforme `Architecture.md`, Jasmine e Karma são as ferramentas padrão para tes
   4.  Verificar se o arquivo de resultado é mencionado/acessível.
 - **Test Data Management for UI:** Vídeos de teste pequenos e padronizados seriam necessários no repositório. A API `core-logic` seria mockada ou executada em um modo de teste que retorna resultados previsíveis.
 
+### Mocking FastAPI Endpoints
+
+Para testar componentes e serviços que interagem com a API `core-logic`, seguiremos estas estratégias:
+
+1. **HTTP Interceptor Mock:**
+
+   ```typescript
+   // src/app/core/testing/http-mock.interceptor.ts
+   @Injectable()
+   export class HttpMockInterceptor implements HttpInterceptor {
+     intercept(
+       req: HttpRequest<any>,
+       next: HttpHandler
+     ): Observable<HttpEvent<any>> {
+       // Mock para endpoint de análise
+       if (req.url.includes("/analise") && req.method === "POST") {
+         return of(
+           new HttpResponse({
+             status: 200,
+             body: {
+               score_similaridade: 0.85,
+               arquivo_resultado: "/path/to/results.json",
+             },
+           })
+         );
+       }
+
+       // Mock para endpoint de status
+       if (req.url.includes("/status_servidor") && req.method === "GET") {
+         return of(
+           new HttpResponse({
+             status: 200,
+             body: { status: "online" },
+           })
+         );
+       }
+
+       return next.handle(req);
+     }
+   }
+   ```
+
+2. **Test Module Configuration:**
+
+   ```typescript
+   // src/app/features/analysis-setup/analysis-setup.component.spec.ts
+   TestBed.configureTestingModule({
+     declarations: [AnalysisSetupComponent],
+     imports: [HttpClientTestingModule],
+     providers: [
+       {
+         provide: HTTP_INTERCEPTORS,
+         useClass: HttpMockInterceptor,
+         multi: true,
+       },
+     ],
+   });
+   ```
+
+3. **CORS Considerations:**
+
+   - Em testes que precisam acessar o servidor FastAPI real (ex: testes de integração):
+     - O servidor FastAPI deve ter CORS configurado para aceitar requisições do ambiente de teste
+     - Usar `environment.test.ts` com URL base específica para testes
+     - Considerar usar `--cors` ao iniciar o servidor FastAPI em modo de teste
+
+4. **Test Data Fixtures:**
+
+   - Manter fixtures de teste em `src/app/core/testing/fixtures/`
+   - Incluir exemplos de payloads de requisição e resposta
+   - Documentar o formato esperado dos dados para facilitar a manutenção dos testes
+
+5. **Error Scenarios:**
+   - Testar respostas de erro da API (400, 500, etc.)
+   - Verificar se os componentes exibem mensagens de erro apropriadas
+   - Simular timeouts e falhas de rede
+
 ## Accessibility (AX) Implementation Details
 
 Embora não seja o foco principal para um MVP de TCC (conforme PRD), boas práticas básicas serão seguidas.
@@ -643,6 +809,79 @@ Para uma aplicação Electron local, as preocupações de segurança são difere
   - Usar `preload.js` para expor APIs IPC específicas (já definido).
   - Validar todos os dados e comandos recebidos do processo Renderer no processo Main.
   - Limitar o escopo de módulos do Node.js expostos ao Renderer.
+- **File Path Validation:**
+
+  - Implementar validação rigorosa de caminhos de arquivo retornados pelos diálogos do Electron:
+
+    ```typescript
+    // src/app/core/utils/path-validator.ts
+    export class PathValidator {
+      private static readonly ALLOWED_DIRECTORIES = [
+        // Diretórios permitidos para acesso
+        path.join(app.getPath("userData"), "videos"),
+        path.join(app.getPath("userData"), "results"),
+      ];
+
+      static validateFilePath(filePath: string): boolean {
+        const normalizedPath = path.normalize(filePath);
+
+        // Verifica se o caminho está dentro de um diretório permitido
+        return this.ALLOWED_DIRECTORIES.some((allowedDir) =>
+          normalizedPath.startsWith(allowedDir)
+        );
+      }
+
+      static sanitizeFilePath(filePath: string): string | null {
+        const normalizedPath = path.normalize(filePath);
+
+        // Remove caracteres potencialmente perigosos
+        const sanitizedPath = normalizedPath.replace(/[<>:"|?*]/g, "");
+
+        // Verifica se o caminho sanitizado ainda é válido
+        return this.validateFilePath(sanitizedPath) ? sanitizedPath : null;
+      }
+    }
+    ```
+
+  - Usar o validador em todos os pontos onde caminhos de arquivo são manipulados:
+
+    ```typescript
+    // Exemplo de uso no ElectronService
+    async showOpenDialog(options: OpenDialogOptions): Promise<OpenDialogReturnValue> {
+      const result = await this.api.showOpenDialog(options);
+
+      if (!result.canceled && result.filePaths.length > 0) {
+        const validatedPaths = result.filePaths
+          .map(path => PathValidator.sanitizeFilePath(path))
+          .filter((path): path is string => path !== null);
+
+        return {
+          canceled: false,
+          filePaths: validatedPaths
+        };
+      }
+
+      return result;
+    }
+    ```
+
+  - Implementar logging de tentativas de acesso a arquivos inválidos:
+    ```typescript
+    // src/app/core/services/security-logger.service.ts
+    @Injectable({
+      providedIn: "root",
+    })
+    export class SecurityLoggerService {
+      logInvalidFileAccess(attemptedPath: string, source: string): void {
+        console.warn(`Tentativa de acesso a arquivo inválido:`, {
+          path: attemptedPath,
+          source,
+          timestamp: new Date().toISOString(),
+        });
+        // TODO: Implementar logging mais robusto se necessário
+      }
+    }
+    ```
 
 ## Browser Support and Progressive Enhancement
 

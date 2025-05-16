@@ -39,14 +39,14 @@ A seguir, um diagrama conceitual simples ilustrando essa interação:
 
 ```mermaid
 graph TD
-    Usuario[Usuário] --> IU_ElectronAngular[app-ui (Electron/Angular)];
-    IU_ElectronAngular -- "1. Inicia/Verifica Servidor Python" --> ServidorPython[core-logic (Servidor FastAPI)];
-    IU_ElectronAngular -- "2. Envia Dados (Vídeo/Parâmetros) via HTTP" --> ServidorPython;
-    ServidorPython -- "3. Processa (MediaPipe, NumPy, Análise)" --> ServidorPython;
-    ServidorPython -- "4. Salva Resultados (JSON/CSV)" --> SistemaArquivos[Sistema de Arquivos Local];
-    ServidorPython -- "5. Retorna Sumário/Caminho via HTTP" --> IU_ElectronAngular;
-    IU_ElectronAngular -- "6. Exibe Resultados" --> Usuario;
-    IU_ElectronAngular -- "7. Ao fechar, finaliza Servidor Python" --> ServidorPython;
+    Usuario[Usuário] --> IU_ElectronAngular[app-ui (Electron/Angular)]
+    IU_ElectronAngular -- "1. Inicia/Verifica Servidor Python" --> ServidorPython[core-logic (Servidor FastAPI)]
+    IU_ElectronAngular -- "2. Envia Dados (Vídeo/Parâmetros) via HTTP" --> ServidorPython
+    ServidorPython -- "3. Processa (MediaPipe, NumPy, Análise)" --> ServidorPython
+    ServidorPython -- "4. Salva Resultados (JSON/CSV)" --> SistemaArquivos[Sistema de Arquivos Local]
+    ServidorPython -- "5. Retorna Sumário/Caminho via HTTP" --> IU_ElectronAngular
+    IU_ElectronAngular -- "6. Exibe Resultados" --> Usuario
+    IU_ElectronAngular -- "7. Ao fechar, finaliza Servidor Python" --> ServidorPython
 ```
 
 ## Component View
@@ -72,8 +72,8 @@ Esta seção detalhará os principais componentes lógicos do sistema, suas resp
 
   - **Responsabilidades:**
     - Expor uma API HTTP local (FastAPI) com endpoints claramente definidos para as funcionalidades de análise.
-      - Ex: `POST /analise`: recebe caminho do vídeo e parâmetros, inicia a análise, retorna um ID de job ou resultados diretos se síncrono.
-      - Ex: `GET /status_servidor`: retorna o status operacional do servidor.
+      - Ex: `POST /analises`: recebe caminho do vídeo e parâmetros, inicia a análise, retorna um ID de job ou resultados diretos se síncrono.
+      - Ex: `GET /status`: retorna o status operacional do servidor.
     - Realizar o processamento principal da análise de movimento:
       - Carregar e processar os arquivos de vídeo.
       - Utilizar a biblioteca MediaPipe para extração de dados de pose.
@@ -135,11 +135,114 @@ Para guiar o desenvolvimento e garantir uma estrutura coesa, alguns padrões arq
   - **Descrição:** O `core-logic` exporá seus serviços através de uma API seguindo os princípios RESTful, utilizando FastAPI.
   - **Justificativa:** Fornece uma interface padronizada e bem definida para a comunicação. FastAPI facilita a criação de APIs robustas com validação de dados e documentação automática.
 
-- **Padrão 4: Processamento Assíncrono (para operações de análise no `core-logic` - a considerar)**
+- **Padrão 4: Processamento Assíncrono (para operações de análise no `core-logic`)**
 
-  - **Descrição:** Se as análises de vídeo forem demoradas, a API do `core-logic` pode ser projetada para lidar com essas operações de forma assíncrona. O frontend iniciaria uma análise e poderia consultar o status ou ser notificado da conclusão.
+  - **Descrição:** Para análises de vídeo que podem ser demoradas, a API do `core-logic` implementará um padrão assíncrono usando `BackgroundTasks` do FastAPI e um sistema de filas simples em memória. O frontend iniciará uma análise e poderá consultar o status ou ser notificado da conclusão.
   - **Justificativa:** Evita que a interface do usuário (`app-ui`) fique bloqueada esperando por operações longas, melhorando a experiência do usuário. FastAPI suporta nativamente operações assíncronas (`async/await`).
-  - _Nota: Inicialmente, um fluxo síncrono será implementado para simplificar. A transição para assíncrono pode ser considerada se a performance da UI for impactada._
+  - **Implementação:**
+
+    ```python
+    from fastapi import BackgroundTasks, HTTPException
+    from typing import Dict
+    import asyncio
+    from datetime import datetime
+
+    # Estrutura para armazenar jobs em memória
+    jobs: Dict[str, Dict] = {}
+
+    @app.post("/analises")
+    async def criar_analise(
+        request: AnaliseRequest,
+        background_tasks: BackgroundTasks
+    ) -> AnaliseResponse:
+        # Gera ID único para o job
+        job_id = str(uuid.uuid4())
+
+        # Inicializa status do job
+        jobs[job_id] = {
+            "status": "pendente",
+            "created_at": datetime.now(),
+            "result": None,
+            "error": None
+        }
+
+        # Adiciona tarefa ao background
+        background_tasks.add_task(
+            processar_analise,
+            job_id=job_id,
+            request=request
+        )
+
+        return {
+            "status": "sucesso",
+            "mensagem": "Análise iniciada com sucesso",
+            "job_id": job_id
+        }
+
+    @app.get("/analises/{job_id}")
+    async def obter_status_analise(job_id: str) -> AnaliseStatusResponse:
+        if job_id not in jobs:
+            raise HTTPException(status_code=404, detail="Job não encontrado")
+
+        job = jobs[job_id]
+        return {
+            "status": job["status"],
+            "result": job["result"],
+            "error": job["error"],
+            "created_at": job["created_at"]
+        }
+
+    async def processar_analise(job_id: str, request: AnaliseRequest):
+        try:
+            jobs[job_id]["status"] = "processando"
+
+            # Processamento da análise
+            resultado = await analisar_videos(request)
+
+            jobs[job_id].update({
+                "status": "concluido",
+                "result": resultado
+            })
+        except Exception as e:
+            jobs[job_id].update({
+                "status": "erro",
+                "error": str(e)
+            })
+    ```
+
+  - **Fluxo de Processamento Assíncrono:**
+
+    ```mermaid
+    sequenceDiagram
+        participant AppUI as app-ui (Frontend)
+        participant API as core-logic (FastAPI)
+        participant Background as Background Task
+        participant Storage as Job Storage
+
+        AppUI->>API: POST /analises (dados da análise)
+        API->>Storage: Cria novo job
+        API-->>AppUI: Retorna job_id (202 Accepted)
+
+        loop Polling Status
+            AppUI->>API: GET /analises/{job_id}
+            API->>Storage: Consulta status
+            API-->>AppUI: Retorna status atual
+        end
+
+        Note over Background: Processamento em background
+        Background->>Storage: Atualiza status
+        Background->>Storage: Salva resultados
+
+        AppUI->>API: GET /analises/{job_id}
+        API->>Storage: Consulta resultados
+        API-->>AppUI: Retorna resultados completos
+    ```
+
+  - **Considerações de Implementação:**
+    - Para produção, considerar migrar para Celery + Redis/RabbitMQ
+    - Implementar limpeza periódica de jobs antigos
+    - Adicionar timeout para jobs pendentes
+    - Considerar persistência de jobs em caso de reinicialização do servidor
 
 - **Padrão 5: Ambiente Virtualizado para Dependências Python (`venv`)**
 
@@ -210,18 +313,83 @@ Esta seção descreve as APIs consumidas e fornecidas pelo sistema. Para este pr
 
 - **Endpoints:**
 
-  - **`POST /analise`**
+  - **`POST /analises`**
 
     - **Descrição:** Submete um ou mais vídeos e os parâmetros de análise para processamento. Inicialmente, a análise será síncrona.
     - **Request Body Schema:** O corpo da requisição será um JSON conforme o modelo Pydantic `AnaliseRequest`.
     - **Success Response Schema (Código: `200 OK`):** O corpo da resposta será um JSON conforme o modelo Pydantic `AnaliseResponse`.
     - **Error Response Schema (Códigos: `4xx`, `5xx`):** FastAPI fornecerá uma resposta JSON padrão para erros.
 
-  - **`GET /status_servidor`**
+  - **`GET /status`**
 
     - **Descrição:** Endpoint simples para o `app-ui` verificar se o servidor `core-logic` está ativo e respondendo.
     - **Request Body Schema:** N/A
     - **Success Response Schema (Código: `200 OK`):** O corpo da resposta será um JSON conforme o modelo Pydantic `StatusServidorResponse`.
+
+### Exemplos de Respostas de Erro
+
+#### 1. Erro de Validação (400 Bad Request)
+
+```json
+{
+  "detail": [
+    {
+      "loc": ["body", "video_principal_path"],
+      "msg": "field required",
+      "type": "value_error.missing"
+    },
+    {
+      "loc": ["body", "parametros_analise", "sensibilidade_dtw"],
+      "msg": "ensure this value is less than or equal to 1.0",
+      "type": "value_error.number.not_le",
+      "ctx": { "limit_value": 1.0 }
+    }
+  ]
+}
+```
+
+#### 2. Arquivo de Vídeo Não Encontrado (404 Not Found)
+
+```json
+{
+  "detail": "Arquivo de vídeo não encontrado: /caminho/para/video.mp4"
+}
+```
+
+#### 3. Erro de Processamento (500 Internal Server Error)
+
+```json
+{
+  "detail": "Erro ao processar vídeo: formato não suportado"
+}
+```
+
+#### 4. Job Não Encontrado (404 Not Found)
+
+```json
+{
+  "detail": "Job não encontrado: 123e4567-e89b-12d3-a456-426614174000"
+}
+```
+
+#### 5. Job em Progresso (409 Conflict)
+
+```json
+{
+  "detail": "Job ainda em processamento: 123e4567-e89b-12d3-a456-426614174000"
+}
+```
+
+### Códigos de Status HTTP
+
+| Código | Descrição             | Uso                                       |
+| ------ | --------------------- | ----------------------------------------- |
+| 200    | OK                    | Resposta bem-sucedida                     |
+| 202    | Accepted              | Análise iniciada (assíncrona)             |
+| 400    | Bad Request           | Erro de validação dos parâmetros          |
+| 404    | Not Found             | Recurso não encontrado                    |
+| 409    | Conflict              | Conflito de estado (ex: job em progresso) |
+| 500    | Internal Server Error | Erro interno do servidor                  |
 
 ## Data Models
 
@@ -384,7 +552,7 @@ Esta seção descreve as APIs consumidas e fornecidas pelo sistema. Para este pr
 
 ## Core Workflow / Sequence Diagrams
 
-O diagrama de sequência de alto nível já foi apresentado anteriormente. Abaixo, um diagrama de sequência mais detalhado para o fluxo principal da API `POST /analise`.
+O diagrama de sequência de alto nível já foi apresentado anteriormente. Abaixo, um diagrama de sequência mais detalhado para o fluxo principal da API `POST /analises`.
 
 ```mermaid
 sequenceDiagram
@@ -394,7 +562,7 @@ sequenceDiagram
     participant CoreLogic_Processing as core-logic (Processamento Python)
 
     AppUI_Renderer->>AppUI_Main: Usuário solicita análise (caminhos de vídeo, parâmetros)
-    AppUI_Main->>CoreLogic_API: Requisição HTTP POST /analise (JSON com video_paths, params)
+    AppUI_Main->>CoreLogic_API: Requisição HTTP POST /analises (JSON com video_paths, params)
     activate CoreLogic_API
     CoreLogic_API->>CoreLogic_Processing: Chama função de análise(dados_requisição)
     activate CoreLogic_Processing

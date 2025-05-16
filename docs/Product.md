@@ -24,32 +24,66 @@ Este projeto é o Trabalho de Conclusão de Curso do estudante (usuário princip
 
 ## Requisitos Funcionais (MVP)
 
-1.  **RF001: Carregamento de Vídeo Duplo:** O sistema deve permitir que o usuário selecione e carregue dois arquivos de vídeo (formato comum, ex: `.mp4`, `.mov`) para comparação.
-2.  **RF002: Extração de Pose (`MediaPipe`):** Para cada vídeo carregado, o sistema deve processá-lo para extrair 33 landmarks de pose 2D (`x`, `y`) e idealmente 3D (`x`, `y`, `z`, com a coordenada `z` sendo usada com cautela devido à sua natureza estimada em vídeos 2D) e scores de visibilidade para cada landmark detectado, em cada frame, utilizando a biblioteca `MediaPipe`.
-3.  **RF003: Sincronização de Vídeo (Manual para MVP):** Para o MVP, o usuário será responsável por garantir que os dois vídeos estejam sincronizados em termos de início do movimento de dança (ex: editando os vídeos previamente para começarem no mesmo ponto da coreografia, que será considerado o "tempo 0").
-4.  **RF004: Normalização de Pose:** Antes da comparação, os dados de pose extraídos devem ser normalizados para minimizar diferenças devido ao tamanho dos dançarinos e sua posição/orientação na tela.
-    1.  **Normalização de Tamanho:** Escalonar os landmarks de pose com base em uma métrica corporal consistente (ex: distância entre ombros ou altura do tronco).
-    2.  **Normalização de Posição:** Transladar os landmarks de pose para uma origem comum (ex: centralizar pelo ponto médio do quadril).
-5.  **RF005: Representação Híbrida da Pose:** Cada pose (conjunto de landmarks de um frame) deve ser representada por um vetor que combine:
-    - Coordenadas normalizadas dos landmarks selecionados (com prioridade para membros e tronco).
-    - Ângulos chave do corpo (ex: ângulos de cotovelos, joelhos, tronco).
-6.  **RF006: Ponderação de Landmarks:** O sistema deve permitir que o usuário atribua diferentes pesos de importância a grupos predefinidos de landmarks corporais (ex: "braços", "pernas", "tronco") para influenciar o cálculo de similaridade.
-7.  **RF007: Comparação de Sequência de Movimento (DTW):** O sistema deve utilizar o algoritmo Dynamic Time Warping (DTW) para comparar a sequência temporal completa de representações de pose híbridas normalizadas dos dois vídeos, resultando em um score de distância/similaridade global.
-8.  **RF008: Comparação de Ritmo/Velocidade (Opcional):**
-    8.1 O sistema deve incluir um componente para analisar a velocidade relativa dos movimentos entre os dois vídeos, calculando a taxa de variação temporal dos landmarks corporais chave (ex: quadril, ombros) e comparando os padrões de aceleração/desaceleração.
-    8.2 O usuário deve poder habilitar ou desabilitar esta análise através de um controle na interface, com um peso configurável (0-100%) para determinar sua influência no score final de similaridade.
-    8.3 Quando habilitado, o resultado da comparação deve combinar o score de similaridade de pose (DTW) com o score de similaridade de ritmo/velocidade, usando o peso definido pelo usuário para calcular uma média ponderada que represente o score final de similaridade da dança.
-9.  **RF009: Parametrização da Sensibilidade de Comparação:** O sistema deve permitir que o usuário ajuste parâmetros que definam a sensibilidade da comparação de poses (margem de erro), refletindo a abordagem híbrida (distância e ângulo).
-10. **RF010: Saída de Resultados:** O sistema deve apresentar o score final de similaridade da dança. Os scores e os principais parâmetros utilizados na comparação devem ser salvos em um arquivo (ex: `JSON` ou `CSV`) para análise posterior pelo pesquisador.
+1. **RF001: Carregamento de Vídeo Duplo**
+   O sistema deve permitir que o usuário selecione e carregue dois arquivos de vídeo (formato comum, ex: `.mp4`, `.mov`) para comparação.
+
+2. **RF002: Extração de Pose (`MediaPipe`)**
+   Para cada vídeo carregado, o sistema deve processá-lo para extrair 33 landmarks de pose 2D (`x`, `y`) e idealmente 3D (`x`, `y`, `z`, com a coordenada `z` sendo usada com cautela devido à sua natureza estimada em vídeos 2D) e scores de visibilidade para cada landmark detectado, em cada frame, utilizando a biblioteca `MediaPipe`.
+
+3. **RF003: Sincronização de Vídeo (Manual para MVP)**
+   Para o MVP, o usuário será responsável por garantir que os dois vídeos estejam sincronizados em termos de início do movimento de dança (ex: editando os vídeos previamente para começarem no mesmo ponto da coreografia, que será considerado o "tempo 0"). A sincronização automática é considerada para versões futuras do sistema.
+
+4. **RF004: Normalização de Pose**
+   Antes da comparação, os dados de pose extraídos devem ser normalizados para minimizar diferenças devido ao tamanho dos dançarinos e sua posição/orientação na tela.
+
+   a. **RF004.1: Normalização de Tamanho**
+   Escalonar os landmarks de pose com base em uma métrica corporal consistente (ex: distância entre ombros ou altura do tronco).
+
+   b. **RF004.2: Normalização de Posição**
+   Transladar os landmarks de pose para uma origem comum (ex: centralizar pelo ponto médio do quadril).
+
+5. **RF005: Representação Híbrida da Pose**
+   Cada pose (conjunto de landmarks de um frame) deve ser representada por um vetor que combine:
+
+   - Coordenadas normalizadas dos landmarks selecionados (com prioridade para membros e tronco).
+   - Ângulos chave do corpo (ex: ângulos de cotovelos, joelhos, tronco).
+
+6. **RF006: Ponderação de Landmarks**
+   O sistema deve permitir que o usuário atribua diferentes pesos de importância a grupos predefinidos de landmarks corporais (ex: "braços", "pernas", "tronco") para influenciar o cálculo de similaridade.
+
+7. **RF007: Comparação de Sequência de Movimento (DTW)**
+   O sistema deve utilizar o algoritmo Dynamic Time Warping (DTW) para comparar a sequência temporal completa de representações de pose híbridas normalizadas dos dois vídeos, resultando em um score de distância/similaridade global.
+
+8. **RF008: Comparação de Ritmo/Velocidade (Opcional)**
+
+   a. **RF008.1: Análise de Velocidade**
+   O sistema deve incluir um componente para analisar a velocidade relativa dos movimentos entre os dois vídeos, calculando a taxa de variação temporal dos landmarks corporais chave (ex: quadril, ombros) e comparando os padrões de aceleração/desaceleração.
+
+   b. **RF008.2: Controle de Análise**
+   O usuário deve poder habilitar ou desabilitar esta análise através de um controle na interface, com um peso configurável (0-100%) para determinar sua influência no score final de similaridade.
+
+   c. **RF008.3: Combinação de Scores**
+   Quando habilitado, o resultado da comparação deve combinar o score de similaridade de pose (DTW) com o score de similaridade de ritmo/velocidade, usando o peso definido pelo usuário para calcular uma média ponderada que represente o score final de similaridade da dança.
+
+9. **RF009: Parametrização da Sensibilidade de Comparação**
+   O sistema deve permitir que o usuário ajuste parâmetros que definam a sensibilidade da comparação de poses (margem de erro), refletindo a abordagem híbrida (distância e ângulo).
+
+10. **RF010: Saída de Resultados**
+    O sistema deve apresentar o score final de similaridade da dança. Os scores e os principais parâmetros utilizados na comparação devem ser salvos em um arquivo (ex: `JSON` ou `CSV`) para análise posterior pelo pesquisador.
 
 ## Requisitos Não Funcionais (MVP)
 
-1.  **RNF001: Usabilidade (Foco Pesquisador):** A interface do usuário (desktop) deve ser clara e funcional, permitindo que o pesquisador (usuário principal) carregue vídeos, configure parâmetros de análise facilmente e visualize os resultados principais. A interface não precisa de design elaborado, mas sim de clareza funcional.
-2.  **RNF002: Desempenho:** O processamento dos vídeos e a análise comparativa devem ser executáveis em uma máquina desktop local padrão (CPU/GPU) em um tempo razoável para experimentação no contexto de um TCC (ex: minutos, não horas, para vídeos de dança de duração típica).
-3.  **RNF003: Precisão:** O sistema deve fornecer resultados de similaridade consistentes e reproduzíveis, permitindo ao pesquisador testar diferentes parâmetros e analisar o impacto na precisão percebida, conforme os objetivos do TCC.
-4.  **RNF004: Modulariade:** O código da lógica principal (Python) deve ser organizado de forma modular para facilitar o entendimento, a manutenção e potenciais extensões futuras (ex: testar diferentes algoritmos de comparação ou métricas).
-5.  **RNF005: Plataforma:** O sistema será uma aplicação desktop, utilizando `Electron` e `Angular` para o frontend e Python para a lógica de processamento principal, operando localmente na máquina do usuário.
-6.  **RNF006: Confiabilidade:** A extração de pose deve ser robusta para vídeos de qualidade razoável. O processo de comparação deve ser determinístico para os mesmos inputs e parâmetros.
+1.  **RNF001: Usabilidade (Foco Pesquisador)** A interface do usuário (desktop) deve ser clara e funcional, permitindo que o pesquisador (usuário principal) carregue vídeos, configure parâmetros de análise facilmente e visualize os resultados principais. A interface não precisa de design elaborado, mas sim de clareza funcional.
+
+2.  **RNF002: Desempenho** O processamento dos vídeos e a análise comparativa devem ser executáveis em uma máquina desktop local padrão (CPU/GPU) em um tempo razoável para experimentação no contexto de um TCC (ex: minutos, não horas, para vídeos de dança de duração típica). [Ver detalhes de otimização de desempenho na seção "Considerações de Desempenho" do documento de arquitetura](docs/Architecture.md#considerações-de-desempenho).
+
+3.  **RNF003: Precisão** O sistema deve fornecer resultados de similaridade consistentes e reproduzíveis, permitindo ao pesquisador testar diferentes parâmetros e analisar o impacto na precisão percebida, conforme os objetivos do TCC.
+
+4.  **RNF004: Modulariade** O código da lógica principal (Python) deve ser organizado de forma modular para facilitar o entendimento, a manutenção e potenciais extensões futuras (ex: testar diferentes algoritmos de comparação ou métricas). [Ver detalhes da arquitetura modular na seção "Estrutura do Sistema" do documento de arquitetura](docs/Architecture.md#estrutura-do-sistema).
+
+5.  **RNF005: Plataforma** O sistema será uma aplicação desktop, utilizando `Electron` e `Angular` para o frontend e Python para a lógica de processamento principal, operando localmente na máquina do usuário.
+
+6.  **RNF006: Confiabilidade** A extração de pose deve ser robusta para vídeos de qualidade razoável. O processo de comparação deve ser determinístico para os mesmos inputs e parâmetros.
 
 ## Metas de Interação e Design do Usuário
 
@@ -108,82 +142,95 @@ Aplicação desktop local (Windows, macOS, Linux, conforme suportado pelo `Elect
 
 ### Épico 1: Fundação do Projeto e Interface do Usuário Inicial
 
-**Objetivo:** Configurar o ambiente de desenvolvimento do monorepo, criar a estrutura básica da aplicação `Electron`/`Angular` e a interface inicial para seleção de arquivos de vídeo e exibição de um resultado placeholder. Integrar a comunicação básica entre o frontend e um script Python placeholder.
-
-### Épico 2: Processamento de Vídeo e Extração de Pose com Normalização
-
-**Objetivo:** Implementar a lógica em Python para carregar os vídeos selecionados, extrair frames, integrar o `MediaPipe` para detecção e extração de landmarks de pose, e aplicar os algoritmos de normalização de pose (tamanho e posição).
-
-### Épico 3: Motor de Comparação de Movimento
-
-**Objetivo:** Desenvolver o núcleo da lógica de comparação, incluindo a representação híbrida da pose, a implementação do DTW para sequências de pose, o cálculo do score de similaridade, a funcionalidade de ponderação de landmarks, a análise opcional de ritmo/velocidade e a parametrização da sensibilidade.
-
-### Épico 4: Integração Final, Testes e Geração de Resultados
-
-**Objetivo:** Integrar completamente o motor de comparação com a interface do usuário, permitir que o usuário dispare a análise com os parâmetros definidos, exiba o score final na UI e salve os resultados detalhados em arquivos. Realizar testes de ponta a ponta com vídeos de exemplo (K-pop, Sapateado).
-
-## Detalhamento dos Épicos e Histórias de Usuário
-
-### Épico 1: Fundação do Projeto e Interface do Usuário Inicial
-
-**Objetivo:** Configurar o ambiente de desenvolvimento do monorepo, criar a estrutura básica da aplicação `Electron`/`Angular` e a interface inicial para seleção de arquivos de vídeo e exibição de um resultado placeholder. Integrar a comunicação básica entre o frontend e um script Python placeholder.
+**Objetivo:** Configurar o ambiente de desenvolvimento do monorepo e criar a estrutura básica da aplicação `Electron`/`Angular` com interface inicial para seleção de arquivos de vídeo.
 
 **Histórias de Usuário:**
 
 - **HU1.1:** Como pesquisador, quero conseguir iniciar a aplicação desktop para acessar suas funcionalidades.
+
   - **AC:** A aplicação `Electron` é compilada e executada com sucesso. Uma janela principal é exibida.
+
 - **HU1.2:** Como pesquisador, quero uma interface onde eu possa selecionar dois arquivos de vídeo da minha máquina.
   - **AC:** A UI possui dois botões/campos distintos para "Selecionar Vídeo 1" e "Selecionar Vídeo 2". Clicar neles abre um diálogo nativo de seleção de arquivos. Os caminhos dos arquivos selecionados são exibidos na UI.
-- **HU1.3:** Como pesquisador, quero um botão para "Iniciar Comparação" que, inicialmente, possa apenas confirmar os vídeos selecionados e chamar um script Python básico.
+
+### Épico 2: Integração Básica com Backend Python
+
+**Objetivo:** Estabelecer a comunicação básica entre o frontend e o backend Python, incluindo a estrutura para exibição de resultados.
+
+**Histórias de Usuário:**
+
+- **HU2.1:** Como pesquisador, quero um botão para "Iniciar Comparação" que possa chamar um script Python básico.
+
   - **AC:** Um botão "Iniciar Comparação" está presente. Ao ser clicado, os caminhos dos vídeos selecionados são passados para um script Python de backend. O script Python confirma o recebimento (ex: print no console).
-- **HU1.4:** Como pesquisador, quero ver uma área na UI onde o resultado da comparação será exibido (inicialmente um valor placeholder).
+
+- **HU2.2:** Como pesquisador, quero ver uma área na UI onde o resultado da comparação será exibido (inicialmente um valor placeholder).
   - **AC:** Existe uma seção na UI designada para "Resultado da Similaridade", que exibe um texto como "--%".
 
-### Épico 2: Processamento de Vídeo e Extração de Pose com Normalização
+### Épico 3: Processamento de Vídeo e Extração de Pose com Normalização
 
 **Objetivo:** Implementar a lógica em Python para carregar os vídeos selecionados, extrair frames, integrar o `MediaPipe` para detecção e extração de landmarks de pose, e aplicar os algoritmos de normalização de pose (tamanho e posição).
 
 **Histórias de Usuário:**
 
-- **HU2.1:** Como pesquisador, quero que o sistema, ao receber os caminhos dos vídeos, consiga processá-los para extrair todos os landmarks de pose (33 pontos, coordenadas `x`,`y`,`z` e visibilidade) de cada frame usando `MediaPipe`.
+- **HU3.1:** Como pesquisador, quero que o sistema, ao receber os caminhos dos vídeos, consiga processá-los para extrair todos os landmarks de pose (33 pontos, coordenadas `x`,`y`,`z` e visibilidade) de cada frame usando `MediaPipe`.
+
   - **AC:** Para cada vídeo, uma sequência de landmarks de pose por frame é gerada. Os dados são armazenados em uma estrutura de dados acessível (ex: lista de listas de landmarks). O processamento lida com o fim do vídeo.
-- **HU2.2:** Como pesquisador, quero que os dados de pose extraídos para cada dançarino sejam normalizados em relação ao tamanho (escala).
+
+- **HU3.2:** Como pesquisador, quero que os dados de pose extraídos para cada dançarino sejam normalizados em relação ao tamanho (escala).
+
   - **AC:** Uma função de normalização de tamanho é implementada (ex: usando distância ombro-quadril como referência). Todos os landmarks de uma pose são reescalonados consistentemente.
-- **HU2.3:** Como pesquisador, quero que os dados de pose normalizados por tamanho também sejam normalizados em relação à posição (translação).
+
+- **HU3.3:** Como pesquisador, quero que os dados de pose normalizados por tamanho também sejam normalizados em relação à posição (translação).
+
   - **AC:** Uma função de normalização de posição é implementada (ex: centralizando pelo ponto médio do quadril). Todas as poses são transladadas para uma origem comum.
-- **HU2.4:** Como pesquisador, quero que o sistema registre (para fins de depuração/análise) os timestamps de cada frame processado pelo `MediaPipe`.
+
+- **HU3.4:** Como pesquisador, quero que o sistema registre (para fins de depuração/análise) os timestamps de cada frame processado pelo `MediaPipe`.
   - **AC:** Para cada conjunto de landmarks extraídos, o timestamp correspondente do vídeo é armazenado.
 
-### Épico 3: Motor de Comparação de Movimento
+### Épico 4: Motor de Comparação de Movimento
 
 **Objetivo:** Desenvolver o núcleo da lógica de comparação, incluindo a representação híbrida da pose, a implementação do DTW para sequências de pose, o cálculo do score de similaridade, a funcionalidade de ponderação de landmarks, a análise opcional de ritmo/velocidade e a parametrização da sensibilidade.
 
 **Histórias de Usuário:**
 
-- **HU3.1:** Como pesquisador, quero que cada pose normalizada seja convertida em uma representação vetorial híbrida, combinando coordenadas de landmarks priorizados (membros, tronco) e ângulos corporais chave.
+- **HU4.1:** Como pesquisador, quero que cada pose normalizada seja convertida em uma representação vetorial híbrida, combinando coordenadas de landmarks priorizados (membros, tronco) e ângulos corporais chave.
+
   - **AC:** Uma função cria um vetor de características para cada pose, incluindo as coordenadas normalizadas (`x`,`y`) dos landmarks relevantes e os ângulos calculados (ex: cotovelos, joelhos).
-- **HU3.2:** Como pesquisador, quero poder definir, através da UI, pesos diferentes para grupos de landmarks (ex: Tronco, Braço Esquerdo, Braço Direito, Perna Esquerda, Perna Direita) que serão usados no cálculo de similaridade de pose.
+
+- **HU4.2:** Como pesquisador, quero poder definir, através da UI, pesos diferentes para grupos de landmarks (ex: Tronco, Braço Esquerdo, Braço Direito, Perna Esquerda, Perna Direita) que serão usados no cálculo de similaridade de pose.
+
   - **AC:** A UI permite input para pesos (ex: de 0.0 a 1.0). Esses pesos são passados para a lógica de comparação. A representação da pose ou o cálculo de distância entre poses considera esses pesos.
-- **HU3.3:** Como pesquisador, quero que o sistema compare as duas sequências de vetores de pose usando Dynamic Time Warping (DTW) para obter um score de distância/similaridade.
+
+- **HU4.3:** Como pesquisador, quero que o sistema compare as duas sequências de vetores de pose usando Dynamic Time Warping (DTW) para obter um score de distância/similaridade.
+
   - **AC:** O algoritmo DTW é implementado e calcula a distância entre as duas sequências de pose. A distância é convertida em um score de similaridade (ex: 0-100%).
-- **HU3.4:** Como pesquisador, quero poder habilitar/desabilitar uma análise de ritmo/velocidade e, quando habilitada, quero que ela influencie o score final.
+
+- **HU4.4:** Como pesquisador, quero poder habilitar/desabilitar uma análise de ritmo/velocidade e, quando habilitada, quero que ela influencie o score final.
+
   - **AC:** A UI possui um controle para ligar/desligar a análise de ritmo. Se ligada, uma métrica de similaridade de ritmo/velocidade é calculada (ex: baseada na variação de posição de landmarks chave ao longo do tempo). O score de ritmo/velocidade é combinado com o score de similaridade de pose (DTW) usando um peso significativo.
-- **HU3.5:** Como pesquisador, quero poder ajustar, através da UI, a sensibilidade da comparação de poses (margem de erro) para a abordagem híbrida.
+
+- **HU4.5:** Como pesquisador, quero poder ajustar, através da UI, a sensibilidade da comparação de poses (margem de erro) para a abordagem híbrida.
   - **AC:** A UI permite input para definir limiares de distância e/ou ângulo para a correspondência de poses. Esses limiares são usados pela função de custo dentro do DTW ou na comparação de poses individuais.
 
-### Épico 4: Integração Final, Testes e Geração de Resultados
+### Épico 5: Integração Final, Testes e Geração de Resultados
 
 **Objetivo:** Integrar completamente o motor de comparação com a interface do usuário, permitir que o usuário dispare a análise com os parâmetros definidos, exiba o score final na UI e salve os resultados detalhados em arquivos. Realizar testes de ponta a ponta com vídeos de exemplo (K-pop, Sapateado).
 
 **Histórias de Usuário:**
 
-- **HU4.1:** Como pesquisador, quero que os parâmetros de pesos de landmarks e sensibilidade definidos na UI sejam corretamente utilizados pelo motor de comparação Python.
+- **HU5.1:** Como pesquisador, quero que os parâmetros de pesos de landmarks e sensibilidade definidos na UI sejam corretamente utilizados pelo motor de comparação Python.
+
   - **AC:** Os valores da UI são passados para o backend Python e aplicados na lógica de cálculo de similaridade.
-- **HU4.2:** Como pesquisador, quero, após clicar em "Iniciar Comparação", ver o score final de similaridade exibido na UI.
+
+- **HU5.2:** Como pesquisador, quero, após clicar em "Iniciar Comparação", ver o score final de similaridade exibido na UI.
+
   - **AC:** O score calculado pelo motor Python é retornado para a UI e exibido na área de resultados designada. O processamento acontece em background para não travar a UI (feedback de "processando..." é desejável).
-- **HU4.3:** Como pesquisador, quero que os resultados da comparação (score final, parâmetros usados, talvez scores intermediários se aplicável) sejam salvos automaticamente em um arquivo (`JSON` ou `CSV`) em um diretório conhecido.
+
+- **HU5.3:** Como pesquisador, quero que os resultados da comparação (score final, parâmetros usados, talvez scores intermediários se aplicável) sejam salvos automaticamente em um arquivo (`JSON` ou `CSV`) em um diretório conhecido.
+
   - **AC:** Um arquivo de resultado é gerado no diretório `results-output/` após cada comparação bem-sucedida, contendo o score principal e os parâmetros de entrada que o geraram. O nome do arquivo pode ser baseado nos vídeos de entrada ou timestamp.
-- **HU4.4:** Como pesquisador, quero testar o sistema completo com pelo menos dois pares de vídeos de K-pop e dois pares de vídeos de Sapateado para validar a funcionalidade e observar os scores.
+
+- **HU5.4:** Como pesquisador, quero testar o sistema completo com pelo menos dois pares de vídeos de K-pop e dois pares de vídeos de Sapateado para validar a funcionalidade e observar os scores.
   - **AC:** O sistema processa os vídeos de teste sem erros. Os scores gerados são plausíveis e refletem as diferenças/similaridades esperadas (qualitativamente). Os resultados são salvos corretamente.
 
 ## Documentos de Referência Chave
@@ -194,7 +241,13 @@ Aplicação desktop local (Windows, macOS, Linux, conforme suportado pelo `Elect
 
 ## Ideias Fora do Escopo (Pós-MVP)
 
-- Sincronização automática de vídeo baseada em análise de áudio ou características visuais.
+- **Sincronização Automática de Vídeo:** Implementação de algoritmos para detectar automaticamente o início do movimento de dança em ambos os vídeos, utilizando técnicas como:
+
+  - Análise de características visuais para identificar frames-chave do movimento
+  - Detecção de padrões de movimento usando landmarks corporais
+  - Possível integração com análise de áudio para sincronização baseada em batidas musicais
+  - Interface para ajuste fino manual após a sincronização automática inicial
+
 - Visualizações avançadas na UI mostrando as diferenças de pose frame a frame ou destacando seções de baixa similaridade.
 - Suporte para comparação em tempo real (ex: com webcam).
 - Análise e relatório detalhado de similaridade para sub-sequências específicas da dança.
