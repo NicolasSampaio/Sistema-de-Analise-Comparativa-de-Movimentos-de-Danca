@@ -1,38 +1,91 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
+const { spawn } = require("child_process");
+
+let mainWindow;
+let pythonProcess;
 
 function createWindow() {
-  const win = new BrowserWindow({
-    width: 1200,
-    height: 800,
+  mainWindow = new BrowserWindow({
+    width: 1280,
+    height: 720,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
 
-  // Em desenvolvimento, carrega o servidor de desenvolvimento do Angular
+  // Carrega a aplicação Angular
+  mainWindow.loadURL("http://localhost:4200");
+
+  // Abre o DevTools em desenvolvimento
   if (process.env.NODE_ENV === "development") {
-    win.loadURL("http://localhost:4200");
-    win.webContents.openDevTools();
-  } else {
-    // Em produção, carrega o arquivo index.html compilado
-    win.loadFile(path.join(__dirname, "dist/dance-comparison-app/index.html"));
+    mainWindow.webContents.openDevTools();
   }
 }
 
-app.whenReady().then(() => {
-  createWindow();
+function startPythonProcess() {
+  // Inicia o processo Python
+  pythonProcess = spawn("python", ["core-logic/main_core.py"], {
+    stdio: ["pipe", "pipe", "pipe"],
+  });
 
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+  pythonProcess.stdout.on("data", (data) => {
+    console.log(`Python stdout: ${data}`);
+  });
+
+  pythonProcess.stderr.on("data", (data) => {
+    console.error(`Python stderr: ${data}`);
+  });
+
+  pythonProcess.on("close", (code) => {
+    console.log(`Python process exited with code ${code}`);
+  });
+}
+
+// Configuração do IPC para comunicação com Python
+ipcMain.handle("python-request", async (event, requestData) => {
+  return new Promise((resolve, reject) => {
+    if (!pythonProcess) {
+      reject(new Error("Python process not started"));
+      return;
     }
+
+    // Envia a requisição para o processo Python
+    pythonProcess.stdin.write(JSON.stringify(requestData) + "\n", (err) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      // Lê a resposta do Python
+      pythonProcess.stdout.once("data", (data) => {
+        try {
+          const response = JSON.parse(data.toString());
+          resolve(response);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
   });
 });
 
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
+app.whenReady().then(() => {
+  createWindow();
+  startPythonProcess();
+
+  app.on("activate", function () {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+});
+
+app.on("window-all-closed", function () {
+  if (process.platform !== "darwin") app.quit();
+});
+
+app.on("before-quit", () => {
+  if (pythonProcess) {
+    pythonProcess.kill();
   }
 });

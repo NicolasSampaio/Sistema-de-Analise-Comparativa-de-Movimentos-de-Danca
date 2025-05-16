@@ -25,7 +25,7 @@ Este projeto é um sistema de software desenvolvido como Trabalho de Conclusão 
 1. Clone o repositório:
 
 ```bash
-git clone [URL_DO_REPOSITÓRIO]
+git clone [https://github.com/NicolasSampaio/Sistema-de-Analise-Comparativa-de-Movimentos-de-Danca]
 cd dance-comparison-app
 ```
 

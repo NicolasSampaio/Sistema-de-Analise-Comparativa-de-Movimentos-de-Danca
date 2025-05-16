@@ -3,33 +3,11 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "dance-comparison-app": {
+    "app-ui": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "scss",
-          "skipTests": true
-        },
-        "@schematics/angular:class": {
-          "skipTests": true
-        },
-        "@schematics/angular:directive": {
-          "skipTests": true
-        },
-        "@schematics/angular:guard": {
-          "skipTests": true
-        },
-        "@schematics/angular:interceptor": {
-          "skipTests": true
-        },
-        "@schematics/angular:pipe": {
-          "skipTests": true
-        },
-        "@schematics/angular:resolver": {
-          "skipTests": true
-        },
-        "@schematics/angular:service": {
-          "skipTests": true
+          "style": "scss"
         }
       },
       "root": "",
@@ -39,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/dance-comparison-app",
+            "outputPath": "dist/app-ui",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -86,10 +64,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "dance-comparison-app:build:production"
+              "buildTarget": "app-ui:build:production"
             },
             "development": {
-              "buildTarget": "dance-comparison-app:build:development"
+              "buildTarget": "app-ui:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -120,8 +98,5 @@
         }
       }
     }
-  },
-  "cli": {
-    "analytics": false
   }
 }
